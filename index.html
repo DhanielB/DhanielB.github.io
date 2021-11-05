@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    </style>
+  </head>
+  <body>
+    <div id="content" class="content">
+      <form id="login" class="login">
+        <h1>Entrar com codigo...</h1>
+        <p>Seu codigo : </p><div id="yourcode" class="yourcode"></div>
+        <input type="text" id="code" class="code" placeholder="Seu Código..."/>
+        <input onclick="openCode();" type="button" id="enter" class="enter"/>
+        <a onclick="newCode();">Não tem um codigo? Gere um agora</a>
+      </form>
+      <form id="main" class="main">
+        <div id="room" class="room"></div><br>
+        <div id="messages" class="messages"></div>
+        <div id="top-content" class="top-content"></div>
+        <div id="text-content" class="text-content">
+          <input type="button" id="upload" class="upload"/>
+          <input type="text" id="text" class="text" placeholder="Digite aqui..."/>
+          <input type="button" id="submit" class="submit" onclick="sendMessage();"/>
+        </div>
+      </form>
+    </div>
+    <script type="text/javascript">
+      var code_data;
+      
+      const room = document.getElementById("room");
+      const code = document.getElementById("code");
+      const main = document.getElementById("main");
+      const text = document.getElementById("text");
+      const login = document.getElementById("login");
+      const submit = document.getElementById("submit");
+      const upload = document.getElementById("upload");
+      const yourcode = document.getElementById("yourcode");
+      const messages = document.getElementById("messages");
+    
+      const _GET = (name) => {
+        return localStorage.getItem(name);
+      }
+      const _SET = (name, argument) => {
+        return localStorage.setItem(name, argument);
+      }
+      const _DELETE = (name) => {
+        return localStorage.removeItem(name);
+      }
+     const _CLEAR = () => {
+        return localStorage.clear();
+      }
+      
+      const _UI = (type) => {
+        if(type == "login") {
+          main.style.display = "none";
+          login.style.display = "";
+        }
+        if(type == "main") {
+          main.style.display = "";
+          login.style.display = "none";
+          room.innerHTML = code_data + "<br>";
+        }
+      }
+      
+      _UI("login");
+      const newCode = () => {
+        code_data = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000);
+        _UI("main");
+      }
+      
+      const openCode = () => {
+        code_data = code.value;
+        if(code_data.length == 6 && isNaN(code_data)) {
+          _UI("main");
+        }
+      }
+      
+      const reloadMessages = () => {
+        const message = JSON.parse(_GET("messages:" + code_data));
+        messages.innerHTML = "";
+        for(const i in message) {
+          messages.innerHTML += message[i]+"<br>";
+        }
+      }
+      
+      const reload = setInterval(reloadMessages, 1);
+      
+      const sendMessage = () => {
+        if(_GET("messages:" + code_data) == null) {
+          data = _SET("messages:" + code_data, "[]");
+        }
+        old_data = JSON.parse(_GET("messages:" + code_data));
+        old_data.push(text.value);
+        
+        _SET("messages:" + code_data, JSON.stringify(old_data));
+        text.value = "";
+      }
+    </script>
+  </body>
+</html>
